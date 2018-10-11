@@ -14,12 +14,12 @@ struct bitmap
 bitmap *all_ones(int len)
 {
     len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = (uint64_t*)malloc(len*sizeof(uint64_t));
+    uint64_t *b = (uint64_t *)malloc(len * sizeof(uint64_t));
     for (int i = 0; i < len; ++i)
     {
         b[i] = 0xFFFFFFFFFFFFFFFF;
     }
-    bitmap *map = (bitmap*)malloc(sizeof(bitmap));
+    bitmap *map = (bitmap *)malloc(sizeof(bitmap));
     map->bits = b;
     map->len = len;
     return map;
@@ -28,12 +28,12 @@ bitmap *all_ones(int len)
 bitmap *all_zeroes(int len)
 {
     len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = (uint64_t*)malloc(len*sizeof(uint64_t));
+    uint64_t *b = (uint64_t *)malloc(len * sizeof(uint64_t));
     for (int i = 0; i < len; ++i)
     {
         b[i] = 0ull;
     }
-    bitmap *map = (bitmap*)malloc(sizeof(bitmap));
+    bitmap *map = (bitmap *)malloc(sizeof(bitmap));
     map->bits = b;
     map->len = len;
     return map;
@@ -44,7 +44,7 @@ void shift_left_1(bitmap *map)
     int i;
     uint64_t msb_prev = 0;
     uint64_t msb_cur;
-    for (i = 0; i+3 < map->len; i += 4)
+    for (i = 0; i < map->len - 3; i += 4)
     {
         msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1ull;
         map->bits[i] = (map->bits[i] << 1) | msb_prev;
@@ -125,7 +125,7 @@ vector<int> shift_or(string txt, string pat, string ab)
         }
     }
 
-    for(int i = 0; i<ab.length(); ++i)
+    for (int i = 0; i < ab.length(); ++i)
     {
         free(C[ab[i]]->bits);
         free(C[ab[i]]);
