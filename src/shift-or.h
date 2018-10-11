@@ -8,18 +8,18 @@ using namespace std;
 struct bitmap
 {
     uint64_t *bits;
-    int len;
+    uint32_t len;
 };
 
 bitmap *all_ones(int len)
 {
     len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = new uint64_t[len];
+    uint64_t *b = (uint64_t*)malloc(len*sizeof(uint64_t));
     for (int i = 0; i < len; ++i)
     {
         b[i] = 0xFFFFFFFFFFFFFFFF;
     }
-    bitmap *map = new bitmap;
+    bitmap *map = (bitmap*)malloc(sizeof(bitmap));
     map->bits = b;
     map->len = len;
     return map;
@@ -28,12 +28,12 @@ bitmap *all_ones(int len)
 bitmap *all_zeroes(int len)
 {
     len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = new uint64_t[len];
+    uint64_t *b = (uint64_t*)malloc(len*sizeof(uint64_t));
     for (int i = 0; i < len; ++i)
     {
         b[i] = 0ull;
     }
-    bitmap *map = new bitmap;
+    bitmap *map = (bitmap*)malloc(sizeof(bitmap));
     map->bits = b;
     map->len = len;
     return map;
@@ -42,9 +42,9 @@ bitmap *all_zeroes(int len)
 void shift_left_1(bitmap *map)
 {
     int i;
-    uint64_t msb_prev = 0ull;
+    uint64_t msb_prev = 0;
     uint64_t msb_cur;
-    for (i = 0; i < map->len; i += 4)
+    for (i = 0; i+3 < map->len; i += 4)
     {
         msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1ull;
         map->bits[i] = (map->bits[i] << 1) | msb_prev;
@@ -90,7 +90,7 @@ void set(bitmap *map, int pos)
 
 void reset(bitmap *map, int pos)
 {
-    map->bits[pos / 64] ^= 1ull << (pos % 64);
+    map->bits[pos / 64] &= (1ull << (pos % 64)) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
 unordered_map<char, bitmap *> char_mask(string pat, string ab)
@@ -112,8 +112,8 @@ vector<int> shift_or(string txt, string pat, string ab)
 {
     int n = txt.length();
     int m = pat.length();
-    bitmap *S = all_ones(m);
     unordered_map<char, bitmap *> C = char_mask(pat, ab);
+    bitmap *S = all_ones(m);
     vector<int> occ;
     for (int i = 0; i < n; ++i)
     {
@@ -124,6 +124,14 @@ vector<int> shift_or(string txt, string pat, string ab)
             occ.push_back(i - m + 1);
         }
     }
+
+    for(int i = 0; i<ab.length(); ++i)
+    {
+        free(C[ab[i]]->bits);
+        free(C[ab[i]]);
+    }
+    free(S->bits);
+    free(S);
     return occ;
 }
 
