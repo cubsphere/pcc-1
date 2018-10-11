@@ -119,6 +119,7 @@ vector<int> boyer_moore(string txt, string pat, string ab)
     return occ;
 }
 
+/*
 int main()
 {
     string txt = "ababcababcababc";
@@ -131,3 +132,4 @@ int main()
     }
     return 0;
 }
+*/

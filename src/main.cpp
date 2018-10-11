@@ -3,7 +3,10 @@
 #include <getopt.h>
 #include <string>
 #include <vector>
-#include "boyer-moore.h"
+#include "./algorithms/exact/boyer-moore.h"
+#include "./algorithms/exact/shift-or.h"
+
+using namespace std;
 
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
