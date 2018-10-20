@@ -7,6 +7,7 @@
 #include <vector>
 #include "boyer-moore.h"
 #include "shift-or.h"
+#include "helpful-string.h"
 
 using namespace std;
 using Algorithm = function<vector<int>(string, string, string, int)>;
@@ -24,9 +25,9 @@ int main(int argc, char **argv)
     vector<string> text_paths;
     bool text_defined = false;
 
-    vector<string> pattern_paths;
+    string pattern_path;
     string pattern;
-    bool use_pattern_paths = false;
+    bool use_pattern_path = false;
     bool pattern_defined = false;
 
     int c;
@@ -54,13 +55,9 @@ int main(int argc, char **argv)
             break;
 
         case 'p':
-            --optind;
-            for (; optind < argc && *(argv[optind]) != '-'; ++optind)
-            {
-                pattern_defined = true;
-                use_pattern_paths = true;
-                pattern_paths.push_back(argv[optind]);
-            }
+            pattern_defined = true;
+            use_pattern_path = true;
+            pattern_path = optarg;
             break;
 
         case 'a':
@@ -72,7 +69,7 @@ int main(int argc, char **argv)
             break;
 
         case 'h':
-            cout << "this very informative message helps you run this program!";
+            cout << helpful_string;
             break;
 
         case '?':
@@ -94,6 +91,12 @@ int main(int argc, char **argv)
             text_paths.push_back(argv[optind]);
         }
         ++optind;
+    }
+
+    if(!pattern_defined || !text_defined)
+    {
+        cout << helpful_string;
+        return 1;
     }
 
     if (algorithm_name.length() == 0)
@@ -118,29 +121,26 @@ int main(int argc, char **argv)
             continue;
         }
 
-        if (!use_pattern_paths)
+        if (!use_pattern_path)
         {
             process_text(text_file, pattern, algorithm, count_mode, edit_distance);
         }
         else
         {
             ifstream pattern_file;
-            for (auto const &pattern_path : pattern_paths)
+            pattern_file.open(pattern_path);
+            if (!pattern_file.is_open())
             {
-                pattern_file.open(pattern_path);
-                if (!pattern_file.is_open())
-                {
-                    cout << "____ could not open pattern file " + pattern_path + " ____\n";
-                    continue;
-                }
-                getline(pattern_file, pat);
-                while(!text_file.eof())
-                {
-                    process_text(text_file, pat, algorithm, count_mode, edit_distance);
-                    getline(pattern_file, pat);
-                }
-                pattern_file.close();
+                cout << "____ could not open pattern file " + pattern_path + " ____\n";
+                return 1;
             }
+            getline(pattern_file, pat);
+            while(!text_file.eof())
+            {
+                process_text(text_file, pat, algorithm, count_mode, edit_distance);
+                getline(pattern_file, pat);
+            }
+            pattern_file.close();
         }
         text_file.close();
     }

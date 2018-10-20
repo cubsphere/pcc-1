@@ -55,14 +55,7 @@ void shift_left_1(bitmap *map)
 void bitOr(bitmap *map1, bitmap *map2)
 {
     int i;
-    for (i = 0; i < map1->len; i += 4)
-    {
-        map1->bits[i] |= map2->bits[i];
-        map1->bits[i + 1] |= map2->bits[i + 1];
-        map1->bits[i + 2] |= map2->bits[i + 2];
-        map1->bits[i + 3] |= map2->bits[i + 3];
-    }
-    for (int j = i; j < map1->len; ++j)
+    for (int j = 0; j < map1->len; ++j)
     {
         map1->bits[j] |= map2->bits[j];
     }
