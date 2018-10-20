@@ -8,13 +8,9 @@
 #include "boyer-moore.h"
 #include "shift-or.h"
 #include "helpful-string.h"
+#include "algorithm-manager.h"
 
 using namespace std;
-using Algorithm = function<vector<int>(string, string, string, int)>;
-
-Algorithm findAlgorithm(string algorithm_name, int edit_distance);
-void process_text(ifstream &text_file, string pat, Algorithm algorithm, bool count_mode, int edit_distance);
-bool checkFile(ifstream file);
 
 int main(int argc, char **argv)
 {
@@ -50,7 +46,7 @@ int main(int argc, char **argv)
         {
         case 'e':
             edit_distance = stoi(optarg);
-            if(edit_distance < 0)
+            if (edit_distance < 0)
                 edit_distance *= -1;
             break;
 
@@ -93,7 +89,7 @@ int main(int argc, char **argv)
         ++optind;
     }
 
-    if(!pattern_defined || !text_defined)
+    if (!pattern_defined || !text_defined)
     {
         cout << helpful_string;
         return 1;
@@ -106,8 +102,8 @@ int main(int argc, char **argv)
         else
             algorithm_name = "some-algorithm";
     }
-    Algorithm algorithm = findAlgorithm(algorithm_name, edit_distance);
-    if (algorithm == nullptr)
+    bool alg_ok = verify_algorithm(algorithm_name, edit_distance);
+    if (!alg_ok)
         return 1;
 
     ifstream text_file;
@@ -123,7 +119,7 @@ int main(int argc, char **argv)
 
         if (!use_pattern_path)
         {
-            process_text(text_file, pattern, algorithm, count_mode, edit_distance);
+            process_text(text_file, pattern, algorithm_name, count_mode, edit_distance);
         }
         else
         {
@@ -135,9 +131,9 @@ int main(int argc, char **argv)
                 return 1;
             }
             getline(pattern_file, pat);
-            while(!text_file.eof())
+            while (!pattern_file.eof())
             {
-                process_text(text_file, pat, algorithm, count_mode, edit_distance);
+                process_text(text_file, pat, algorithm_name, count_mode, edit_distance);
                 getline(pattern_file, pat);
             }
             pattern_file.close();
@@ -145,61 +141,4 @@ int main(int argc, char **argv)
         text_file.close();
     }
     return 0;
-}
-
-void process_text(ifstream &text_file, string pat, Algorithm algorithm, bool count_mode, int edit_distance)
-{
-    const string ab = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-    vector<int> occ;
-    int occnum = 0;
-    string txt;
-    if (!count_mode)
-    {
-        getline(text_file, txt);
-        while(!text_file.eof())
-        {
-            occ = algorithm(txt, pat, ab, edit_distance);
-            if(!occ.empty())
-            {
-                cout << txt << '\n';
-            }
-            getline(text_file, txt);
-        }
-    }
-    else
-    {
-        getline(text_file, txt);
-        while(!text_file.eof())
-        {
-            occ = algorithm(txt, pat, ab, edit_distance);
-            occnum += occ.size();
-            getline(text_file, txt);
-        }
-        cout << occnum << " occurences\n";
-    }
-}
-
-Algorithm findAlgorithm(string algorithm_name, int edit_distance)
-{
-    if (algorithm_name.compare("boyer-moore") == 0)
-    {
-        if (edit_distance != 0)
-        {
-            cout << "edit distance must be 0 for boyer-moore\n";
-            return nullptr;
-        }
-        return boyer_moore;
-    }
-    else if (algorithm_name.compare("shift-or") == 0)
-    {
-        if (edit_distance != 0)
-        {
-            cout << "edit distance must be 0 for shift-or\n";
-            return nullptr;
-        }
-        return shift_or;
-    }
-
-    cout << "unrecognized algorithm " << algorithm_name << "\n";
-    return nullptr;
 }

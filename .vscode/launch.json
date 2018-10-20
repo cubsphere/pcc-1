@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/test/od.exe",
-            "args": ["-a", "shift-or"],
+            "args": ["-a", "shift-or", "hello", "text.txt"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/test",
             "environment": [],

@@ -65,7 +65,7 @@ int *good_suffix(string pat)
     return S;
 }
 
-vector<int> boyer_moore(string txt, string pat, string ab, unordered_map<char, int> C, int *S)
+vector<int> boyer_moore(string txt, string pat, unordered_map<char, int> C, int *S)
 {
     int n = txt.length();
     int m = pat.length();
@@ -91,7 +91,7 @@ vector<int> boyer_moore(string txt, string pat, string ab, unordered_map<char, i
     return occ;
 }
 
-vector<int> boyer_moore(string txt, string pat, string ab, int ed)
+vector<int> boyer_moore_standalone(string txt, string pat, string ab, int ed)
 {
     int n = txt.length();
     int m = pat.length();

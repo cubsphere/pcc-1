@@ -5,7 +5,8 @@
         "cstdio": "cpp",
         "vector": "cpp",
         "functional": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "fstream": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }

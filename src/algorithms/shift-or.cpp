@@ -86,7 +86,27 @@ unordered_map<char, bitmap *> char_mask(string pat, string ab)
     return C;
 }
 
-vector<int> shift_or(string txt, string pat, string ab, int ed)
+vector<int> shift_or(string txt, string pat, unordered_map<char, bitmap *> C)
+{
+    int n = txt.length();
+    int m = pat.length();
+    bitmap *S = all_ones(m);
+    vector<int> occ;
+    for (int i = 0; i < n; ++i)
+    {
+        shift_left_1(S);
+        bitOr(S, C[txt[i]]);
+        if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
+        {
+            occ.push_back(i - m + 1);
+        }
+    }
+    free(S->bits);
+    free(S);
+    return occ;
+}
+
+vector<int> shift_or_standalone(string txt, string pat, string ab)
 {
     int n = txt.length();
     int m = pat.length();
