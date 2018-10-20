@@ -1,149 +1,205 @@
-#include <string>
-#include <unordered_map>
-#include <vector>
 #include <iostream>
+#include <fstream>
+#include <functional>
+#include <stdlib.h>
+#include <getopt.h>
+#include <string>
+#include <vector>
+#include "boyer-moore.h"
+#include "shift-or.h"
 
 using namespace std;
+using Algorithm = function<vector<int>(string, string, string, int)>;
 
-struct bitmap
-{
-    uint64_t *bits;
-    uint32_t len;
-};
+Algorithm findAlgorithm(string algorithm_name, int edit_distance);
+void process_text(ifstream &text_file, string pat, Algorithm algorithm, bool count_mode, int edit_distance);
+bool checkFile(ifstream file);
 
-bitmap *all_ones(int len)
+int main(int argc, char **argv)
 {
-    len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = (uint64_t *)malloc(len * sizeof(uint64_t));
-    for (int i = 0; i < len; ++i)
-    {
-        b[i] = 0xFFFFFFFFFFFFFFFF;
-    }
-    bitmap *map = (bitmap *)malloc(sizeof(bitmap));
-    map->bits = b;
-    map->len = len;
-    return map;
-}
+    string algorithm_name;
+    int edit_distance = 0;
+    bool count_mode = false;
 
-bitmap *all_zeroes(int len)
-{
-    len = len / 64 + (len % 64 == 0 ? 0 : 1);
-    uint64_t *b = (uint64_t *)malloc(len * sizeof(uint64_t));
-    for (int i = 0; i < len; ++i)
-    {
-        b[i] = 0ull;
-    }
-    bitmap *map = (bitmap *)malloc(sizeof(bitmap));
-    map->bits = b;
-    map->len = len;
-    return map;
-}
+    vector<string> text_paths;
+    bool text_defined = false;
 
-void shift_left_1(bitmap *map)
-{
-    int i;
-    uint64_t msb_prev = 0;
-    uint64_t msb_cur;
-    for (i = 0; i < map->len - 3; i += 4)
-    {
-        msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i] = (map->bits[i] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 1] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 1] = (map->bits[i + 1] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 2] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 2] = (map->bits[i + 2] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 3] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 3] = (map->bits[i + 3] << 1) | msb_prev;
-        msb_prev = msb_cur;
-    }
-    for (int j = i; j < map->len; ++j)
-    {
-        msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1;
-        map->bits[i] = (map->bits[i] << 1) | msb_prev;
-        msb_prev = msb_cur;
-    }
-}
+    vector<string> pattern_paths;
+    string pattern;
+    bool use_pattern_paths = false;
+    bool pattern_defined = false;
 
-void bitOr(bitmap *map1, bitmap *map2)
-{
-    int i;
-    for (i = 0; i < map1->len; i += 4)
-    {
-        map1->bits[i] |= map2->bits[i];
-        map1->bits[i + 1] |= map2->bits[i + 1];
-        map1->bits[i + 2] |= map2->bits[i + 2];
-        map1->bits[i + 3] |= map2->bits[i + 3];
-    }
-    for (int j = i; j < map1->len; ++j)
-    {
-        map1->bits[j] |= map2->bits[j];
-    }
-}
+    int c;
+    int option_index = 0;
+    static struct option long_options[] = {
+        {"edit", required_argument, 0, 'e'},
+        {"pattern", required_argument, 0, 'p'},
+        {"algorithm_name", required_argument, 0, 'a'},
+        {"count", no_argument, 0, 'c'},
+        {"help", no_argument, 0, 'h'}};
 
-void set(bitmap *map, int pos)
-{
-    map->bits[pos / 64] |= 1ull << (pos % 64);
-}
-
-void reset(bitmap *map, int pos)
-{
-    map->bits[pos / 64] &= (1ull << (pos % 64)) ^ 0xFFFFFFFFFFFFFFFF;
-}
-
-unordered_map<char, bitmap *> char_mask(string pat, string ab)
-{
-    int m = pat.length();
-    unordered_map<char, bitmap *> C;
-    for (int i = 0; i < ab.length(); ++i)
+    while (1)
     {
-        C.emplace(ab[i], all_ones(m));
-    }
-    for (int i = 0; i < m; ++i)
-    {
-        reset(C[pat[i]], i);
-    }
-    return C;
-}
+        c = getopt_long(argc, argv, "e:p:a:ch", long_options, &option_index);
 
-vector<int> shift_or(string txt, string pat, string ab)
-{
-    int n = txt.length();
-    int m = pat.length();
-    unordered_map<char, bitmap *> C = char_mask(pat, ab);
-    bitmap *S = all_ones(m);
-    vector<int> occ;
-    for (int i = 0; i < n; ++i)
-    {
-        shift_left_1(S);
-        bitOr(S, C[txt[i]]);
-        if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
+        if (c == -1)
+            break;
+
+        switch (c)
         {
-            occ.push_back(i - m + 1);
+        case 'e':
+            edit_distance = stoi(optarg);
+            if(edit_distance < 0)
+                edit_distance *= -1;
+            break;
+
+        case 'p':
+            --optind;
+            for (; optind < argc && *(argv[optind]) != '-'; ++optind)
+            {
+                pattern_defined = true;
+                use_pattern_paths = true;
+                pattern_paths.push_back(argv[optind]);
+            }
+            break;
+
+        case 'a':
+            algorithm_name = optarg;
+            break;
+
+        case 'c':
+            count_mode = true;
+            break;
+
+        case 'h':
+            cout << "this very informative message helps you run this program!";
+            break;
+
+        case '?':
+        default:
+            return 1;
         }
     }
 
-    for (int i = 0; i < ab.length(); ++i)
+    while (optind < argc)
     {
-        free(C[ab[i]]->bits);
-        free(C[ab[i]]);
+        if (!pattern_defined)
+        {
+            pattern_defined = true;
+            pattern = argv[optind];
+        }
+        else
+        {
+            text_defined = true;
+            text_paths.push_back(argv[optind]);
+        }
+        ++optind;
     }
-    free(S->bits);
-    free(S);
-    return occ;
-}
 
-int main()
-{
-    string txt = "ababcababcababc";
-    string pat = "ababca";
-    string ab = "abc";
-    vector<int> occ = shift_or(txt, pat, ab);
-    for (vector<int>::iterator it = occ.begin(); it != occ.end(); ++it)
+    if (algorithm_name.length() == 0)
     {
-        cout << *it << ", ";
+        if (edit_distance == 0)
+            algorithm_name = "boyer-moore";
+        else
+            algorithm_name = "some-algorithm";
+    }
+    Algorithm algorithm = findAlgorithm(algorithm_name, edit_distance);
+    if (algorithm == nullptr)
+        return 1;
+
+    ifstream text_file;
+    string pat;
+    for (auto const &text_path : text_paths)
+    {
+        text_file.open(text_path);
+        if (!text_file.is_open())
+        {
+            cout << "____ could not open text file " + text_path + " ____\n";
+            continue;
+        }
+
+        if (!use_pattern_paths)
+        {
+            process_text(text_file, pattern, algorithm, count_mode, edit_distance);
+        }
+        else
+        {
+            ifstream pattern_file;
+            for (auto const &pattern_path : pattern_paths)
+            {
+                pattern_file.open(pattern_path);
+                if (!pattern_file.is_open())
+                {
+                    cout << "____ could not open pattern file " + pattern_path + " ____\n";
+                    continue;
+                }
+                getline(pattern_file, pat);
+                while(!text_file.eof())
+                {
+                    process_text(text_file, pat, algorithm, count_mode, edit_distance);
+                    getline(pattern_file, pat);
+                }
+                pattern_file.close();
+            }
+        }
+        text_file.close();
     }
     return 0;
+}
+
+void process_text(ifstream &text_file, string pat, Algorithm algorithm, bool count_mode, int edit_distance)
+{
+    const string ab = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+    vector<int> occ;
+    int occnum = 0;
+    string txt;
+    if (!count_mode)
+    {
+        getline(text_file, txt);
+        while(!text_file.eof())
+        {
+            occ = algorithm(txt, pat, ab, edit_distance);
+            if(!occ.empty())
+            {
+                cout << txt << '\n';
+            }
+            getline(text_file, txt);
+        }
+    }
+    else
+    {
+        getline(text_file, txt);
+        while(!text_file.eof())
+        {
+            occ = algorithm(txt, pat, ab, edit_distance);
+            occnum += occ.size();
+            getline(text_file, txt);
+        }
+        cout << occnum << " occurences\n";
+    }
+}
+
+Algorithm findAlgorithm(string algorithm_name, int edit_distance)
+{
+    if (algorithm_name.compare("boyer-moore") == 0)
+    {
+        if (edit_distance != 0)
+        {
+            cout << "edit distance must be 0 for boyer-moore\n";
+            return nullptr;
+        }
+        return boyer_moore;
+    }
+    else if (algorithm_name.compare("shift-or") == 0)
+    {
+        if (edit_distance != 0)
+        {
+            cout << "edit distance must be 0 for shift-or\n";
+            return nullptr;
+        }
+        return shift_or;
+    }
+
+    cout << "unrecognized algorithm " << algorithm_name << "\n";
+    return nullptr;
 }

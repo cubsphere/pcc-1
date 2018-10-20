@@ -2,6 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "boyer-moore.h"
 
 using namespace std;
 
@@ -90,7 +91,7 @@ vector<int> boyer_moore(string txt, string pat, string ab, unordered_map<char, i
     return occ;
 }
 
-vector<int> boyer_moore(string txt, string pat, string ab)
+vector<int> boyer_moore(string txt, string pat, string ab, int ed)
 {
     int n = txt.length();
     int m = pat.length();
@@ -100,7 +101,7 @@ vector<int> boyer_moore(string txt, string pat, string ab)
 
     for (int i = 0; i <= n - m;)
     {
-        int j = 0;
+        int j = m-1;
         while (j >= 0 && txt[i + j] == pat[j])
         {
             --j;

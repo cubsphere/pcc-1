@@ -4,18 +4,18 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/test/od.exe",
-            "args": [],
+            "args": ["-a", "shift-or","hello", "text.txt"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/test",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
+            "miDebuggerPath": "G:/Schoolstuffs/Nim/nim-0.18.0/dist/mingw64/bin/gdb.exe",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

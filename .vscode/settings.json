@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "string": "cpp",
+        "cstdio": "cpp",
+        "vector": "cpp",
+        "functional": "cpp",
+        "iosfwd": "cpp"
+    },
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+}

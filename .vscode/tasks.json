@@ -4,16 +4,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compile test",
-            "type": "shell",
-            "command": "g++",
-            "args": [
-                "-o",
-                "test/o.exe",
-                "test/test.cpp"
-            ]
-        },
-        {
             "label": "compile test debug",
             "type": "shell",
             "command": "g++",
@@ -21,8 +11,16 @@
                 "-o",
                 "test/od.exe",
                 "test/test.cpp",
+                "-I",
+                "src/include",
+                "src/algorithms/boyer-moore.cpp",
+                "src/algorithms/shift-or.cpp",
                 "-g"
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

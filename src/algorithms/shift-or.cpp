@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include "shift-or.h"
 
 using namespace std;
 
@@ -41,28 +42,12 @@ bitmap *all_zeroes(int len)
 
 void shift_left_1(bitmap *map)
 {
-    int i;
     uint64_t msb_prev = 0;
     uint64_t msb_cur;
-    for (i = 0; i < map->len - 3; i += 4)
+    for (int j = 0; j < map->len; ++j)
     {
-        msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i] = (map->bits[i] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 1] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 1] = (map->bits[i + 1] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 2] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 2] = (map->bits[i + 2] << 1) | msb_prev;
-        msb_prev = msb_cur;
-        msb_cur = ((map->bits[i + 3] & 0x8000000000000000) >> 63) & 1ull;
-        map->bits[i + 3] = (map->bits[i + 3] << 1) | msb_prev;
-        msb_prev = msb_cur;
-    }
-    for (int j = i; j < map->len; ++j)
-    {
-        msb_cur = ((map->bits[i] & 0x8000000000000000) >> 63) & 1;
-        map->bits[i] = (map->bits[i] << 1) | msb_prev;
+        msb_cur = ((map->bits[j] & 0x8000000000000000) >> 63) & 1;
+        map->bits[j] = (map->bits[j] << 1) | msb_prev;
         msb_prev = msb_cur;
     }
 }
@@ -108,7 +93,7 @@ unordered_map<char, bitmap *> char_mask(string pat, string ab)
     return C;
 }
 
-vector<int> shift_or(string txt, string pat, string ab)
+vector<int> shift_or(string txt, string pat, string ab, int ed)
 {
     int n = txt.length();
     int m = pat.length();
