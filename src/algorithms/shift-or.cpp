@@ -6,12 +6,6 @@
 
 using namespace std;
 
-struct bitmap
-{
-    uint64_t *bits;
-    uint32_t len;
-};
-
 bitmap *all_ones(int len)
 {
     len = len / 64 + (len % 64 == 0 ? 0 : 1);
@@ -86,16 +80,43 @@ unordered_map<char, bitmap *> char_mask(string pat, string ab)
     return C;
 }
 
-vector<int> shift_or(string txt, string pat, unordered_map<char, bitmap *> C)
+vector<int> shift_or_64(string txt, string pat, unordered_map<char, bitmap *> C, bitmap *ones)
+{
+    int n = txt.length();
+    int m = pat.length();
+    uint64_t S = -1ull;
+    vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
+    for (int i = 0; i < n; ++i)
+    {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
+        S = (S << 1) | (ormap->bits[0]);
+        if (!(S & (1ull << (m - 1 % 64))))
+        {
+            occ.push_back(i - m + 1);
+        }
+    }
+    return occ;
+}
+
+vector<int> shift_or(string txt, string pat, unordered_map<char, bitmap *> C, bitmap *ones)
 {
     int n = txt.length();
     int m = pat.length();
     bitmap *S = all_ones(m);
     vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
     for (int i = 0; i < n; ++i)
     {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
         shift_left_1(S);
-        bitOr(S, C[txt[i]]);
+        bitOr(S, ormap);
         if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
         {
             occ.push_back(i - m + 1);
@@ -112,11 +133,17 @@ vector<int> shift_or_standalone(string txt, string pat, string ab)
     int m = pat.length();
     unordered_map<char, bitmap *> C = char_mask(pat, ab);
     bitmap *S = all_ones(m);
+    bitmap *ones = all_ones(m);
     vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
     for (int i = 0; i < n; ++i)
     {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
         shift_left_1(S);
-        bitOr(S, C[txt[i]]);
+        bitOr(S, ormap);
         if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
         {
             occ.push_back(i - m + 1);
@@ -130,6 +157,8 @@ vector<int> shift_or_standalone(string txt, string pat, string ab)
     }
     free(S->bits);
     free(S);
+    free(ones->bits);
+    free(ones);
     return occ;
 }
 

@@ -15,6 +15,7 @@
                 "src/include",
                 "src/algorithms/boyer-moore.cpp",
                 "src/algorithms/shift-or.cpp",
+                "src/algorithm-manager.cpp",
                 "-g"
             ],
             "group": {
