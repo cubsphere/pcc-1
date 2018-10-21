@@ -29,8 +29,8 @@ bool verify_algorithm(char const *algorithm_name, int edit_distance)
         }
         return true;
     }
-    else if (algorithm_name.compare("sellers") == 0 ||
-	     algorithm_name.compare("ukkonen") == 0)
+    else if (strcmp(algorithm_name, "sellers") == 0 ||
+	     strcmp(algorithm_name, "ukkonen") == 0)
     {
 	return true;
     }
@@ -168,11 +168,11 @@ void process_text(ifstream &text_file, char *pat, int patlen, char const *algori
             use_shift_or(text_file, pat, patlen, count_mode);
         }
     }
-     else if (algorithm_name.compare("sellers") == 0)
+    else if (strcmp(algorithm_name, "sellers") == 0)
     {
 	use_sellers(text_file, pat, edit_distance, count_mode);
     }
-    else if (algorithm_name.compare("ukkonen") == 0)
+    else if (strcmp(algorithm_name, "ukkonen") == 0)
     {
 	use_ukkonen(text_file, pat, edit_distance, count_mode);
     }
@@ -200,6 +200,35 @@ void use_sellers(ifstream &text_file, string pat, int edit_distance, bool count_
         while (!text_file.eof())
         {
             occ = sellers(txt, pat, edit_distance);
+            if(!occ.empty())
+                cout << txt << '\n';
+            getline(text_file, txt);
+        }
+    }
+}
+
+void use_ukkonen(ifstream &text_file, string pat, int edit_distance, bool count_mode)
+{
+    string txt;
+    vector<int> occ;
+    getline(text_file, txt);
+    Ukk_fsm fsm = build_ukk_fsm(pat, ab, edit_distance);
+    if (count_mode)
+    {
+        int occnum = 0;
+        while (!text_file.eof())
+        {
+            occ = ukk(txt, pat, ab, edit_distance, fsm);
+            occnum += occ.size();
+            getline(text_file, txt);
+        }
+        cout << occnum << '\n';
+    }
+    else
+    {
+        while (!text_file.eof())
+        {
+            occ = ukk(txt, pat, ab, edit_distance, fsm);
             if(!occ.empty())
                 cout << txt << '\n';
             getline(text_file, txt);
