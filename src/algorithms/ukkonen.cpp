@@ -84,7 +84,7 @@ void tree_add(Node *root, vector<int> s, int idx)
     }
 }
 
-vector<int> next_column(vector<int> s, char* pat, int m, char a, int r)
+vector<int> next_column(vector<int> s, char *pat, int m, char a, int r)
 {
     vector<int> t;
     t.push_back(0);
@@ -95,7 +95,7 @@ vector<int> next_column(vector<int> s, char* pat, int m, char a, int r)
     return t;
 }
 
-Ukk_fsm *build_ukk_fsm(char* pat, int m, char const* ab, int ablen, int r)
+Ukk_fsm *build_ukk_fsm(char *pat, int m, char const *ab, int ablen, int r)
 {
     vector<int> s;
     for (int i = 0; i <= m; i++)
@@ -139,7 +139,7 @@ Ukk_fsm *build_ukk_fsm(char* pat, int m, char const* ab, int ablen, int r)
     return new Ukk_fsm(delta, F, idx);
 }
 
-vector<int> ukk(char* txt, int n, char* pat, int m, char const* ab, int ablen, int r, Ukk_fsm *fsm)
+vector<int> ukk(char *txt, int n, char *pat, int m, char const *ab, int ablen, int r, Ukk_fsm *fsm)
 {
     map<pair<int, char>, int> delta;
     set<int> F;
@@ -167,7 +167,14 @@ vector<int> ukk(char* txt, int n, char* pat, int m, char const* ab, int ablen, i
     for (int i = 0; i < n; i++)
     {
         //	cout << delta[pair<int,char>(s, txt[i])] << endl;
-        s = delta.at(pair<int, char>(s, txt[i]));
+        try
+        {
+            s = delta.at(pair<int, char>(s, txt[i]));
+        }
+        catch (...)
+        {
+            continue;
+        }
         auto search = F.find(s);
         if (search != F.end())
         {
