@@ -109,7 +109,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (*algorithm_name == '\0')
+    if (algorithm_name == nullptr)
     {
         if (edit_distance == 0)
             algorithm_name = "boyer-moore";
