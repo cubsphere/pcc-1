@@ -2,11 +2,13 @@
 #define ALGORITHM_MANAGER_H
 
 #include <fstream>
-#include <string>
 #include "boyer-moore.h"
 #include "shift-or.h"
 
-bool verify_algorithm(string algorithm_name, int edit_distance);
-void process_text(ifstream &text_file, string pat, string algorithm_name, bool count_mode, int edit_distance);
+const int STRING_SIZE = 1048576; //1MB
+const int STRING_SIZE_LESS = 4096; //4KB
+
+bool verify_algorithm(char const* algorithm_name, int edit_distance);
+void process_text(ifstream &text_file, char* pat, int patlen, char const* algorithm_name, bool count_mode, int edit_distance);
 
 #endif

@@ -6,7 +6,13 @@
         "vector": "cpp",
         "functional": "cpp",
         "iosfwd": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "string_view": "cpp",
+        "array": "cpp",
+        "istream": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp",
+        "new": "cpp"
     },
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
 }
