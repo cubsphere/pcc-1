@@ -89,7 +89,15 @@ int main(int argc, char **argv)
 
     if (!pattern_defined || !text_defined)
     {
-        cout << helpful_string;
+        if (!pattern_defined && !text_defined)
+        {
+            cout << helpful_string;
+            return 1;
+        }
+        if (!pattern_defined)
+            cout << "specify a pattern\n";
+        if (!text_defined)
+            cout << "specify a text file\n";
         return 1;
     }
 
