@@ -1,1 +1,15 @@
 bin/
+obj/
+
+# -*- mode: gitignore; -*-
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# directory configuration
+.dir-locals.el
