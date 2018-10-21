@@ -21,7 +21,7 @@ $(OBJ): $(ODIR)/%.o: $(SDIR)/%.cpp $(DEPS)
 .PHONY: clean
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(IDIR)/*~
+	rm -f *~ core $(IDIR)/*~ -r $(ODIR)/ bin/
 
 bin/pmt: $(OBJ)
 	mkdir -p bin
