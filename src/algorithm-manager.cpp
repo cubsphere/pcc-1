@@ -1,9 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
-#include "boyer-moore.h"
-#include "shift-or.h"
-#include "algorithm-manager.h"
+#include "boyer-moore.hpp"
+#include "shift-or.hpp"
+#include "algorithm-manager.hpp"
 
 const char *ab = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
