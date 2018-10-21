@@ -26,6 +26,10 @@ vector<int> sellers(string txt, string pat, int r) {
 	 last = (last+1) % 2;
 	 prev = (prev+1) % 2;
      }
+     delete [] D[0];
+     delete [] D[1];
+     delete [] D;
+     
      return occ;
 }
 
@@ -39,7 +43,7 @@ int** twoD(int n) {
     }
     return arr;
 }
-/*
+
 int main() {
     string txt = "abadac";
     string pat = "cada";
@@ -49,4 +53,4 @@ int main() {
 	cout << occ[i] << endl;
     }
 }
-*/
+
