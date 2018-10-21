@@ -1,22 +1,20 @@
 #include <iostream>
-#include <string>
 #include <unordered_map>
 #include <vector>
-#include "boyer-moore.h"
+#include <string.h>
+#include "boyer-moore.hpp"
 
 using namespace std;
 
-unordered_map<char, int> bad_char(string pat, string ab)
+unordered_map<char, int> bad_char(char* pat, int m, char const* ab, int l)
 {
     unordered_map<char, int> C = unordered_map<char, int>();
 
-    int l = ab.length();
     for (int i = 0; i < l; ++i)
     {
         C[ab[i]] = -1;
     }
 
-    int m = pat.length();
     for (int i = 0; i < m; ++i)
     {
         C[pat[i]] = i;
@@ -24,9 +22,8 @@ unordered_map<char, int> bad_char(string pat, string ab)
     return C;
 }
 
-int *reverse_border(string str)
+int *reverse_border(char* str, int m)
 {
-    int m = str.length();
     int *nxt = new int[m + 1];
     for (int i = 0; i < m + 1; ++i)
     {
@@ -47,10 +44,9 @@ int *reverse_border(string str)
     return nxt;
 }
 
-int *good_suffix(string pat)
+int *good_suffix(char* pat, int m)
 {
-    int m = pat.length();
-    int *R = reverse_border(pat);
+    int *R = reverse_border(pat, m);
     int *S = new int[m + 1];
     for (int i = 0; i < m + 1; ++i)
     {
@@ -65,10 +61,8 @@ int *good_suffix(string pat)
     return S;
 }
 
-vector<int> boyer_moore(string txt, string pat, unordered_map<char, int> C, int *S)
+vector<int> boyer_moore(char* txt, int n, char* pat, int m, unordered_map<char, int> C, int *S)
 {
-    int n = txt.length();
-    int m = pat.length();
     vector<int> occ;
 
     for (int i = 0; i <= n - m;)
@@ -91,12 +85,10 @@ vector<int> boyer_moore(string txt, string pat, unordered_map<char, int> C, int 
     return occ;
 }
 
-vector<int> boyer_moore_standalone(string txt, string pat, string ab, int ed)
+vector<int> boyer_moore_standalone(char* txt, int n, char* pat, int m, char* ab, int ed)
 {
-    int n = txt.length();
-    int m = pat.length();
-    unordered_map<char, int> C = bad_char(pat, ab);
-    int *S = good_suffix(pat);
+    unordered_map<char, int> C = bad_char(pat, m, ab, strlen(ab));
+    int *S = good_suffix(pat, m);
     vector<int> occ;
 
     for (int i = 0; i <= n - m;)
@@ -123,9 +115,9 @@ vector<int> boyer_moore_standalone(string txt, string pat, string ab, int ed)
 /*
 int main()
 {
-    string txt = "ababcababcababc";
-    string pat = "ababca";
-    string ab = "abc";
+    char* txt = "ababcababcababc";
+    char* pat = "ababca";
+    char* ab = "abc";
     vector<int> vec = boyer_moore(txt, pat, ab);
     for (vector<int>::iterator it = vec.begin(); it != vec.end(); ++it)
     {

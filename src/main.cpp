@@ -3,26 +3,24 @@
 #include <functional>
 #include <stdlib.h>
 #include <getopt.h>
-#include <string>
 #include <vector>
-#include "boyer-moore.h"
-#include "shift-or.h"
-#include "helpful-string.h"
-#include "algorithm-manager.h"
+#include <string.h>
+#include "helpful-string.hpp"
+#include "algorithm-manager.hpp"
 
 using namespace std;
 
 int main(int argc, char **argv)
 {
-    string algorithm_name;
+    char const *algorithm_name;
     int edit_distance = 0;
     bool count_mode = false;
 
-    vector<string> text_paths;
+    vector<char *> text_paths;
     bool text_defined = false;
 
-    string pattern_path;
-    string pattern;
+    char *pattern_path;
+    char *pattern;
     bool use_pattern_path = false;
     bool pattern_defined = false;
 
@@ -95,7 +93,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    if (algorithm_name.length() == 0)
+    if (*algorithm_name == '\0')
     {
         if (edit_distance == 0)
             algorithm_name = "boyer-moore";
@@ -107,34 +105,34 @@ int main(int argc, char **argv)
         return 1;
 
     ifstream text_file;
-    string pat;
     for (auto const &text_path : text_paths)
     {
         text_file.open(text_path);
         if (!text_file.is_open())
         {
-            cout << "____ could not open text file " + text_path + " ____\n";
+            cout << "____ could not open text file " << text_path << " ____\n";
             continue;
         }
 
         if (!use_pattern_path)
         {
-            process_text(text_file, pattern, algorithm_name, count_mode, edit_distance);
+            process_text(text_file, pattern, strlen(pattern), algorithm_name, count_mode, edit_distance);
         }
         else
         {
+            char *pat = new char[STRING_SIZE_LESS];
             ifstream pattern_file;
             pattern_file.open(pattern_path);
             if (!pattern_file.is_open())
             {
-                cout << "____ could not open pattern file " + pattern_path + " ____\n";
+                cout << "____ could not open pattern file " << pattern_path << " ____\n";
                 return 1;
             }
-            getline(pattern_file, pat);
+            pattern_file.getline(pat, STRING_SIZE_LESS);
             while (!pattern_file.eof())
             {
-                process_text(text_file, pat, algorithm_name, count_mode, edit_distance);
-                getline(pattern_file, pat);
+                process_text(text_file, pat, pattern_file.gcount(), algorithm_name, count_mode, edit_distance);
+                pattern_file.getline(pat, STRING_SIZE_LESS);
             }
             pattern_file.close();
         }

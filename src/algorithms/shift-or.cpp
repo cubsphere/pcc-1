@@ -1,16 +1,10 @@
-#include <string>
 #include <unordered_map>
 #include <vector>
 #include <iostream>
-#include "shift-or.h"
+#include <string.h>
+#include "shift-or.hpp"
 
 using namespace std;
-
-struct bitmap
-{
-    uint64_t *bits;
-    uint32_t len;
-};
 
 bitmap *all_ones(int len)
 {
@@ -71,11 +65,10 @@ void reset(bitmap *map, int pos)
     map->bits[pos / 64] &= (1ull << (pos % 64)) ^ 0xFFFFFFFFFFFFFFFF;
 }
 
-unordered_map<char, bitmap *> char_mask(string pat, string ab)
+unordered_map<char, bitmap *> char_mask(char* pat, int m, char const* ab, int l)
 {
-    int m = pat.length();
     unordered_map<char, bitmap *> C;
-    for (int i = 0; i < ab.length(); ++i)
+    for (int i = 0; i < l; ++i)
     {
         C.emplace(ab[i], all_ones(m));
     }
@@ -86,16 +79,39 @@ unordered_map<char, bitmap *> char_mask(string pat, string ab)
     return C;
 }
 
-vector<int> shift_or(string txt, string pat, unordered_map<char, bitmap *> C)
+vector<int> shift_or_64(char* txt, int n, char* pat, int m, unordered_map<char, bitmap *> C, bitmap *ones)
 {
-    int n = txt.length();
-    int m = pat.length();
-    bitmap *S = all_ones(m);
+    uint64_t S = -1ull;
     vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
     for (int i = 0; i < n; ++i)
     {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
+        S = (S << 1) | (ormap->bits[0]);
+        if (!(S & (1ull << (m - 1 % 64))))
+        {
+            occ.push_back(i - m + 1);
+        }
+    }
+    return occ;
+}
+
+vector<int> shift_or(char* txt, int n, char* pat, int m, unordered_map<char, bitmap *> C, bitmap *ones)
+{
+    bitmap *S = all_ones(m);
+    vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
+    for (int i = 0; i < n; ++i)
+    {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
         shift_left_1(S);
-        bitOr(S, C[txt[i]]);
+        bitOr(S, ormap);
         if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
         {
             occ.push_back(i - m + 1);
@@ -106,39 +122,45 @@ vector<int> shift_or(string txt, string pat, unordered_map<char, bitmap *> C)
     return occ;
 }
 
-vector<int> shift_or_standalone(string txt, string pat, string ab)
+vector<int> shift_or_standalone(char* txt, int n, char* pat, int m, char* ab)
 {
-    int n = txt.length();
-    int m = pat.length();
-    unordered_map<char, bitmap *> C = char_mask(pat, ab);
+    unordered_map<char, bitmap *> C = char_mask(pat, m, ab, strlen(ab));
     bitmap *S = all_ones(m);
+    bitmap *ones = all_ones(m);
     vector<int> occ;
+    bool exists;
+    bitmap *ormap;
+
     for (int i = 0; i < n; ++i)
     {
+        exists = C[txt[i]] != nullptr;
+        ormap = exists ? C[txt[i]] : ones;
         shift_left_1(S);
-        bitOr(S, C[txt[i]]);
+        bitOr(S, ormap);
         if (!(S->bits[S->len - 1] & (1ull << (m - 1 % 64))))
         {
             occ.push_back(i - m + 1);
         }
     }
 
-    for (int i = 0; i < ab.length(); ++i)
+    for (int i = 0; i < strlen(ab); ++i)
     {
         free(C[ab[i]]->bits);
         free(C[ab[i]]);
     }
     free(S->bits);
     free(S);
+    free(ones->bits);
+    free(ones);
     return occ;
 }
 
 /*
 int main()
 {
-    string txt = "ababcababcababc";
-    string pat = "ababca";
-    string ab = "abc";
+    char* txt = "ababcababcababc";
+    char* pat = "ababca";
+    char* ab = "abc";
     vector<int> occ = shift_or(txt, pat, ab);
     for (vector<int>::iterator it = occ.begin(); it != occ.end(); ++it)
     {
