@@ -6,7 +6,7 @@
 
 using namespace std;
 
-unordered_map<char, int> bad_char(char* pat, int m, char const* ab, int l)
+unordered_map<char, int> bad_char(char *pat, int m, char const *ab, int l)
 {
     unordered_map<char, int> C = unordered_map<char, int>();
 
@@ -22,7 +22,7 @@ unordered_map<char, int> bad_char(char* pat, int m, char const* ab, int l)
     return C;
 }
 
-int *reverse_border(char* str, int m)
+int *reverse_border(char *str, int m)
 {
     int *nxt = new int[m + 1];
     for (int i = 0; i < m + 1; ++i)
@@ -44,7 +44,7 @@ int *reverse_border(char* str, int m)
     return nxt;
 }
 
-int *good_suffix(char* pat, int m)
+int *good_suffix(char *pat, int m)
 {
     int *R = reverse_border(pat, m);
     int *S = new int[m + 1];
@@ -61,13 +61,13 @@ int *good_suffix(char* pat, int m)
     return S;
 }
 
-vector<int> boyer_moore(char* txt, int n, char* pat, int m, unordered_map<char, int> C, int *S)
+vector<int> boyer_moore(char *txt, int n, char *pat, int m, unordered_map<char, int> C, int *S)
 {
     vector<int> occ;
 
     for (int i = 0; i <= n - m;)
     {
-        int j = 0;
+        int j = m - 1;
         while (j >= 0 && txt[i + j] == pat[j])
         {
             --j;
@@ -85,7 +85,7 @@ vector<int> boyer_moore(char* txt, int n, char* pat, int m, unordered_map<char, 
     return occ;
 }
 
-vector<int> boyer_moore_standalone(char* txt, int n, char* pat, int m, char* ab, int ed)
+vector<int> boyer_moore_standalone(char *txt, int n, char *pat, int m, char *ab, int ed)
 {
     unordered_map<char, int> C = bad_char(pat, m, ab, strlen(ab));
     int *S = good_suffix(pat, m);
@@ -93,7 +93,7 @@ vector<int> boyer_moore_standalone(char* txt, int n, char* pat, int m, char* ab,
 
     for (int i = 0; i <= n - m;)
     {
-        int j = m-1;
+        int j = m - 1;
         while (j >= 0 && txt[i + j] == pat[j])
         {
             --j;
