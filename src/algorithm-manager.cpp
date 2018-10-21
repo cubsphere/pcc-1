@@ -31,9 +31,9 @@ bool verify_algorithm(char const *algorithm_name, int edit_distance)
         return true;
     }
     else if (strcmp(algorithm_name, "sellers") == 0 ||
-	     strcmp(algorithm_name, "ukkonen") == 0)
+             strcmp(algorithm_name, "ukkonen") == 0)
     {
-	return true;
+        return true;
     }
 
     cout << "unrecognized algorithm " << algorithm_name << "\n";
@@ -171,68 +171,69 @@ void process_text(ifstream &text_file, char *pat, int patlen, char const *algori
     }
     else if (strcmp(algorithm_name, "sellers") == 0)
     {
-	use_sellers(text_file, pat, edit_distance, count_mode);
+        use_sellers(text_file, pat, patlen, edit_distance, count_mode);
     }
     else if (strcmp(algorithm_name, "ukkonen") == 0)
     {
-	use_ukkonen(text_file, pat, edit_distance, count_mode);
+        use_ukkonen(text_file, pat, patlen, edit_distance, count_mode);
     }
-
 }
 
-void use_sellers(ifstream &text_file, string pat, int edit_distance, bool count_mode)
+void use_sellers(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
 {
-    string txt;
+    char txt[STRING_SIZE];
     vector<int> occ;
-    getline(text_file, txt);
     if (count_mode)
     {
         int occnum = 0;
+        text_file.readsome(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = sellers(txt, pat, edit_distance);
+            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
             occnum += occ.size();
-            getline(text_file, txt);
+            text_file.readsome(txt, STRING_SIZE);
         }
         cout << occnum << '\n';
     }
     else
     {
+        text_file.getline(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = sellers(txt, pat, edit_distance);
-            if(!occ.empty())
+            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
+            if (!occ.empty())
                 cout << txt << '\n';
-            getline(text_file, txt);
+            text_file.getline(txt, STRING_SIZE);
         }
     }
 }
 
-void use_ukkonen(ifstream &text_file, string pat, int edit_distance, bool count_mode)
+void use_ukkonen(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
 {
-    string txt;
+    char txt[STRING_SIZE];
     vector<int> occ;
-    getline(text_file, txt);
-    Ukk_fsm* fsm = build_ukk_fsm(pat, ab, edit_distance);
+    Ukk_fsm* fsm = build_ukk_fsm(pat, patlen, ab, strlen(ab), edit_distance);
     if (count_mode)
     {
         int occnum = 0;
+        text_file.readsome(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = ukk(txt, pat, ab, edit_distance, fsm);
+            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
             occnum += occ.size();
-            getline(text_file, txt);
+            text_file.readsome(txt, STRING_SIZE);
         }
         cout << occnum << '\n';
     }
     else
     {
+        text_file.getline(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = ukk(txt, pat, ab, edit_distance, fsm);
-            if(!occ.empty())
+            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            if (!occ.empty())
                 cout << txt << '\n';
-            getline(text_file, txt);
+            text_file.getline(txt, STRING_SIZE);
         }
     }
 }

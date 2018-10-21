@@ -1,5 +1,4 @@
 #include <iostream>
-#include <string>
 #include <vector>
 #include <algorithm>
 #include "sellers.hpp"
@@ -9,9 +8,7 @@ int phi(int a, int b) {
     return (int) a != b;
 }
 
-vector<int> sellers(string txt, string pat, int r) {
-     long n = txt.length();
-     long m = pat.length();
+vector<int> sellers(char* txt, long n, char* pat, long m, int r) {
      int** D = twoD(m+1);
      int last = 1, prev = 0;
      vector<int> occ;
@@ -45,8 +42,8 @@ int** twoD(int n) {
 }
 /*
 int main() {
-    string txt = "abadac";
-    string pat = "cada";
+    char* txt = "abadac";
+    char* pat = "cada";
     int r = 2;
     vector<int> occ = sellers(txt, pat, r);
     for (int i = 0; i < occ.size(); i++) {
