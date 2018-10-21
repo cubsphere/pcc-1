@@ -43,7 +43,7 @@ int** twoD(int n) {
     }
     return arr;
 }
-
+/*
 int main() {
     string txt = "abadac";
     string pat = "cada";
@@ -53,4 +53,4 @@ int main() {
 	cout << occ[i] << endl;
     }
 }
-
+*/

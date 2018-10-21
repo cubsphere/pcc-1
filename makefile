@@ -6,10 +6,10 @@ CXXFLAGS = -std=c++17 -O2 -I$(IDIR)
 
 ODIR=obj
 
-_DEPS= algorithm-manager.h boyer-moore.h helpful-string.h shift-or.h
+_DEPS= algorithm-manager.hpp boyer-moore.hpp helpful-string.hpp shift-or.hpp sellers.hpp ukkonen.hpp
 DEPS= $(patsubst %,$(IDIR)/%,$(_DEPS))
 
-_OBJ = main.o algorithms/boyer-moore.o algorithms/shift-or.o algorithm-manager.o
+_OBJ = main.o algorithms/boyer-moore.o algorithms/shift-or.o algorithms/sellers.o algorithms/ukkonen.o algorithm-manager.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 all: bin/pmt

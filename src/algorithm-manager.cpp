@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <string.h>
+#include <stdio.h>
 #include "sellers.hpp"
 #include "ukkonen.hpp"
 #include "boyer-moore.hpp"
@@ -212,7 +213,7 @@ void use_ukkonen(ifstream &text_file, string pat, int edit_distance, bool count_
     string txt;
     vector<int> occ;
     getline(text_file, txt);
-    Ukk_fsm fsm = build_ukk_fsm(pat, ab, edit_distance);
+    Ukk_fsm* fsm = build_ukk_fsm(pat, ab, edit_distance);
     if (count_mode)
     {
         int occnum = 0;
