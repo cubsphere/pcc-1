@@ -98,7 +98,7 @@ int main(int argc, char **argv)
         if (edit_distance == 0)
             algorithm_name = "boyer-moore";
         else
-            algorithm_name = "some-algorithm";
+            algorithm_name = "ukkonen"; // trocar pra esse ou sellers
     }
     bool alg_ok = verify_algorithm(algorithm_name, edit_distance);
     if (!alg_ok)
