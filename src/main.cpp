@@ -5,10 +5,8 @@
 #include <getopt.h>
 #include <vector>
 #include <string.h>
-#include "boyer-moore.h"
-#include "shift-or.h"
-#include "helpful-string.h"
-#include "algorithm-manager.h"
+#include "helpful-string.hpp"
+#include "algorithm-manager.hpp"
 
 using namespace std;
 

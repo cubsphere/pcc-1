@@ -2,7 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string.h>
-#include "shift-or.h"
+#include "shift-or.hpp"
 
 using namespace std;
 

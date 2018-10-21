@@ -2,8 +2,8 @@
 #define ALGORITHM_MANAGER_H
 
 #include <fstream>
-#include "boyer-moore.h"
-#include "shift-or.h"
+#include "boyer-moore.hpp"
+#include "shift-or.hpp"
 
 const int STRING_SIZE = 1048576; //1MB
 const int STRING_SIZE_LESS = 4096; //4KB

@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string.h>
-#include "boyer-moore.h"
+#include "boyer-moore.hpp"
 
 using namespace std;
 
