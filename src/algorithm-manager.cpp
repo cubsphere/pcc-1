@@ -49,14 +49,15 @@ void use_boyer_moore(ifstream &text_file, char *pat, int patlen, bool count_mode
     if (count_mode)
     {
         int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
+        text_file.read(txt, STRING_SIZE);
         while (!text_file.eof())
         {
             occ = boyer_moore(txt, text_file.gcount(), pat, patlen, C, S);
             occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
+            text_file.seekg(text_file.tellg() - patlen);
+            text_file.read(txt, STRING_SIZE);
         }
-        printf("%s\n", occnum);
+        printf("%d\n", occnum);
     }
     else
     {
@@ -82,14 +83,15 @@ void use_shift_or_64(ifstream &text_file, char *pat, int patlen, bool count_mode
     if (count_mode)
     {
         int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
+        text_file.read(txt, STRING_SIZE);
         while (!text_file.eof())
         {
             occ = shift_or_64(txt, text_file.gcount(), pat, patlen, C, ones);
             occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
+            text_file.seekg(text_file.tellg() - patlen);
+            text_file.read(txt, STRING_SIZE);
         }
-        printf("%s\n", occnum);
+        printf("%d\n", occnum);
     }
     else
     {
@@ -122,14 +124,15 @@ void use_shift_or(ifstream &text_file, char *pat, int patlen, bool count_mode)
     if (count_mode)
     {
         int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
+        text_file.read(txt, STRING_SIZE);
         while (!text_file.eof())
         {
             occ = shift_or(txt, text_file.gcount(), pat, patlen, C, ones);
             occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
+            text_file.seekg(text_file.tellg() - patlen);
+            text_file.read(txt, STRING_SIZE);
         }
-        printf("%s\n", occnum);
+        printf("%d\n", occnum);
     }
     else
     {
@@ -159,14 +162,15 @@ void use_sellers(ifstream &text_file, char* pat, int patlen, int edit_distance, 
     if (count_mode)
     {
         int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
+        text_file.read(txt, STRING_SIZE);
         while (!text_file.eof())
         {
             occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
             occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
+            text_file.seekg(text_file.tellg() - patlen);
+            text_file.read(txt, STRING_SIZE);
         }
-        printf("%s\n", occnum);
+        printf("%d\n", occnum);
     }
     else
     {
@@ -189,14 +193,15 @@ void use_ukkonen(ifstream &text_file, char* pat, int patlen, int edit_distance, 
     if (count_mode)
     {
         int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
+        text_file.read(txt, STRING_SIZE);
         while (!text_file.eof())
         {
             occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
             occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
+            text_file.seekg(text_file.tellg() - patlen);
+            text_file.read(txt, STRING_SIZE);
         }
-        printf("%s\n", occnum);
+        printf("%d\n", occnum);
     }
     else
     {
