@@ -2,6 +2,7 @@
 #include <fstream>
 #include "boyer-moore.h"
 #include "shift-or.h"
+#include "algorithm-manager.h"
 
 const string ab = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
 
