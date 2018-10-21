@@ -139,7 +139,10 @@ int main(int argc, char **argv)
             pattern_file.getline(pat, STRING_SIZE_LESS);
             while (!pattern_file.eof())
             {
-                process_text(text_file, pat, pattern_file.gcount(), algorithm_name, count_mode, edit_distance);
+                string str = pat;
+                process_text(text_file, pat, pattern_file.gcount()-1, algorithm_name, count_mode, edit_distance);
+                text_file.clear();
+                text_file.seekg(0);
                 pattern_file.getline(pat, STRING_SIZE_LESS);
             }
             pattern_file.close();

@@ -52,20 +52,20 @@ void use_boyer_moore(ifstream &text_file, char *pat, int patlen, bool count_mode
         text_file.readsome(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = boyer_moore(txt, text_file.gcount(), pat, patlen, C, S);
+            occ = boyer_moore(txt, text_file.gcount() - 1, pat, patlen, C, S);
             occnum += occ.size();
             text_file.readsome(txt, STRING_SIZE);
         }
-        cout << occnum << '\n';
+        printf("%s\n", occnum);
     }
     else
     {
         text_file.getline(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = boyer_moore(txt, text_file.gcount(), pat, patlen, C, S);
+            occ = boyer_moore(txt, text_file.gcount() - 1, pat, patlen, C, S);
             if (!occ.empty())
-                cout << txt << '\n';
+                printf("%s\n", txt);
             text_file.getline(txt, STRING_SIZE);
         }
     }
@@ -85,20 +85,20 @@ void use_shift_or_64(ifstream &text_file, char *pat, int patlen, bool count_mode
         text_file.readsome(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = shift_or_64(txt, text_file.gcount(), pat, patlen, C, ones);
+            occ = shift_or_64(txt, text_file.gcount() - 1, pat, patlen, C, ones);
             occnum += occ.size();
             text_file.readsome(txt, STRING_SIZE);
         }
-        cout << occnum << '\n';
+        printf("%s\n", occnum);
     }
     else
     {
         text_file.getline(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = shift_or_64(txt, text_file.gcount(), pat, patlen, C, ones);
+            occ = shift_or_64(txt, text_file.gcount() - 1, pat, patlen, C, ones);
             if (!occ.empty())
-                cout << txt << '\n';
+                printf("%s\n", txt);
             text_file.getline(txt, STRING_SIZE);
         }
     }
@@ -125,20 +125,20 @@ void use_shift_or(ifstream &text_file, char *pat, int patlen, bool count_mode)
         text_file.readsome(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = shift_or(txt, text_file.gcount(), pat, patlen, C, ones);
+            occ = shift_or(txt, text_file.gcount() - 1, pat, patlen, C, ones);
             occnum += occ.size();
             text_file.readsome(txt, STRING_SIZE);
         }
-        cout << occnum << '\n';
+        printf("%s\n", occnum);
     }
     else
     {
         text_file.getline(txt, STRING_SIZE);
         while (!text_file.eof())
         {
-            occ = shift_or(txt, text_file.gcount(), pat, patlen, C, ones);
+            occ = shift_or(txt, text_file.gcount() - 1, pat, patlen, C, ones);
             if (!occ.empty())
-                cout << txt << '\n';
+                printf("%s\n", txt);
             text_file.getline(txt, STRING_SIZE);
         }
     }
@@ -149,6 +149,65 @@ void use_shift_or(ifstream &text_file, char *pat, int patlen, bool count_mode)
     {
         free(C[ab[i]]->bits);
         free(C[ab[i]]);
+    }
+}
+
+void use_sellers(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
+{
+    char txt[STRING_SIZE];
+    vector<int> occ;
+    if (count_mode)
+    {
+        int occnum = 0;
+        text_file.readsome(txt, STRING_SIZE);
+        while (!text_file.eof())
+        {
+            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            occnum += occ.size();
+            text_file.readsome(txt, STRING_SIZE);
+        }
+        printf("%s\n", occnum);
+    }
+    else
+    {
+        text_file.getline(txt, STRING_SIZE);
+        while (!text_file.eof())
+        {
+            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            if (!occ.empty())
+                printf("%s\n", txt);
+            text_file.getline(txt, STRING_SIZE);
+        }
+    }
+}
+
+void use_ukkonen(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
+{
+    char txt[STRING_SIZE];
+    vector<int> occ;
+    Ukk_fsm* fsm = build_ukk_fsm(pat, patlen, ab, strlen(ab), edit_distance);
+    if (count_mode)
+    {
+        int occnum = 0;
+        text_file.readsome(txt, STRING_SIZE);
+        while (!text_file.eof())
+        {
+            occ = ukk(txt, text_file.gcount() - 1, pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            occnum += occ.size();
+            text_file.readsome(txt, STRING_SIZE);
+        }
+        printf("%s\n", occnum);
+    }
+    else
+    {
+        text_file.getline(txt, STRING_SIZE);
+        while (!text_file.eof())
+        {
+            occ = ukk(txt, text_file.gcount() - 1, pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            if (!occ.empty())
+                printf("%s\n", txt);
+            text_file.getline(txt, STRING_SIZE);
+        }
     }
 }
 
@@ -176,64 +235,5 @@ void process_text(ifstream &text_file, char *pat, int patlen, char const *algori
     else if (strcmp(algorithm_name, "ukkonen") == 0)
     {
         use_ukkonen(text_file, pat, patlen, edit_distance, count_mode);
-    }
-}
-
-void use_sellers(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
-{
-    char txt[STRING_SIZE];
-    vector<int> occ;
-    if (count_mode)
-    {
-        int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
-        while (!text_file.eof())
-        {
-            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
-            occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
-        }
-        cout << occnum << '\n';
-    }
-    else
-    {
-        text_file.getline(txt, STRING_SIZE);
-        while (!text_file.eof())
-        {
-            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
-            if (!occ.empty())
-                cout << txt << '\n';
-            text_file.getline(txt, STRING_SIZE);
-        }
-    }
-}
-
-void use_ukkonen(ifstream &text_file, char* pat, int patlen, int edit_distance, bool count_mode)
-{
-    char txt[STRING_SIZE];
-    vector<int> occ;
-    Ukk_fsm* fsm = build_ukk_fsm(pat, patlen, ab, strlen(ab), edit_distance);
-    if (count_mode)
-    {
-        int occnum = 0;
-        text_file.readsome(txt, STRING_SIZE);
-        while (!text_file.eof())
-        {
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
-            occnum += occ.size();
-            text_file.readsome(txt, STRING_SIZE);
-        }
-        cout << occnum << '\n';
-    }
-    else
-    {
-        text_file.getline(txt, STRING_SIZE);
-        while (!text_file.eof())
-        {
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
-            if (!occ.empty())
-                cout << txt << '\n';
-            text_file.getline(txt, STRING_SIZE);
-        }
     }
 }
