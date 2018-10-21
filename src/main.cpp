@@ -43,9 +43,17 @@ int main(int argc, char **argv)
         switch (c)
         {
         case 'e':
-            edit_distance = stoi(optarg);
-            if (edit_distance < 0)
-                edit_distance *= -1;
+            try
+            {
+                edit_distance = stoi(optarg);
+                if (edit_distance < 0)
+                    throw invalid_argument("...");
+            }
+            catch (...)
+            {
+                cout << "edit distance must be a decimal positive integer smaller than 2147483648\n";
+                return 1;
+            }
             break;
 
         case 'p':
@@ -128,7 +136,7 @@ int main(int argc, char **argv)
         }
         else
         {
-            char *pat = new char[STRING_SIZE_LESS];
+            char pat[STRING_SIZE_LESS];
             ifstream pattern_file;
             pattern_file.open(pattern_path);
             if (!pattern_file.is_open())
@@ -140,7 +148,7 @@ int main(int argc, char **argv)
             while (!pattern_file.eof())
             {
                 string str = pat;
-                process_text(text_file, pat, pattern_file.gcount()-1, algorithm_name, count_mode, edit_distance);
+                process_text(text_file, pat, pattern_file.gcount() - 1, algorithm_name, count_mode, edit_distance);
                 text_file.clear();
                 text_file.seekg(0);
                 pattern_file.getline(pat, STRING_SIZE_LESS);
