@@ -203,6 +203,14 @@ void use_sellers(ifstream &text_file, char *pat, int patlen, int edit_distance, 
             pos = text_file.tellg();
             text_file.clear();
             text_file.seekg(pos - patlen + 1);
+
+            text_file.read(txt, patlen - 1);
+            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            int correction = occ.size();
+            occnum -= correction;
+
+            text_file.clear();
+            text_file.seekg(pos - patlen + 1 + correction);
         }
         printf("%d\n", occnum);
     }
@@ -217,6 +225,17 @@ void use_sellers(ifstream &text_file, char *pat, int patlen, int edit_distance, 
             pos = text_file.tellg();
             text_file.clear();
             text_file.seekg(pos - patlen + 1);
+
+            text_file.read(txt, patlen - 1);
+            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            int correction;
+            if(!occ.empty())
+                correction = patlen - 1;
+            else
+                correction = 0;
+
+            text_file.clear();
+            text_file.seekg(pos - patlen + 1 + correction);
         }
     }
 }
@@ -238,6 +257,14 @@ void use_ukkonen(ifstream &text_file, char *pat, int patlen, int edit_distance, 
             pos = text_file.tellg();
             text_file.clear();
             text_file.seekg(pos - patlen + 1);
+
+            text_file.read(txt, patlen - 1);
+            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            int correction = occ.size();
+            occnum -= correction;
+
+            text_file.clear();
+            text_file.seekg(pos - patlen + 1 + correction);
         }
         printf("%d\n", occnum);
     }
@@ -252,6 +279,17 @@ void use_ukkonen(ifstream &text_file, char *pat, int patlen, int edit_distance, 
             pos = text_file.tellg();
             text_file.clear();
             text_file.seekg(pos - patlen + 1);
+
+            text_file.read(txt, patlen - 1);
+            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            int correction;
+            if(!occ.empty())
+                correction = patlen - 1;
+            else
+                correction = 0;
+
+            text_file.clear();
+            text_file.seekg(pos - patlen + 1 + correction);
         }
     }
 }
