@@ -12,7 +12,7 @@ using namespace std;
 
 int main(int argc, char **argv)
 {
-    char const *algorithm_name;
+    char const *algorithm_name = nullptr;
     int edit_distance = 0;
     bool count_mode = false;
 

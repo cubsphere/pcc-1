@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <string_view>
 #include <stdio.h>
 #include "sellers.hpp"
 #include "ukkonen.hpp"
@@ -9,6 +10,7 @@
 #include "algorithm-manager.hpp"
 
 const char *ab = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
+const int ablen = strlen(ab);
 
 bool verify_algorithm(char const *algorithm_name, int edit_distance)
 {
@@ -43,54 +45,53 @@ bool verify_algorithm(char const *algorithm_name, int edit_distance)
 void print_occs(vector<int> occ, char *txt, int n)
 {
     int pos = 0;
-    string s = string(txt);
+    int curr = 0;
+    int next = 0;
+    string_view v = txt;
     while (pos < occ.size())
     {
-        int hind = s.find_last_of('\n', occ[pos]) + 1;
-        int fore = s.find('\n', occ[pos]);
+        curr = 1 + v.rfind('\n', occ[pos]);
+        next = v.find('\n', curr);
+        if(next == -1)
+            next = n;
 
-        if (hind == -1)
-            hind = 0;
-        if (fore == -1)
-            fore = n;
-
-        printf("%.*s\n", fore - hind, txt + hind);
-        while(occ[pos] < fore)
-            ++pos;        
+        printf("%.*s\n", next - curr, txt + curr);
+        while (pos < occ.size() && occ[pos] < next)
+        { 
+            ++pos;
+        }
     }
 }
 
 void use_boyer_moore(ifstream &text_file, char *pat, int patlen, bool count_mode)
 {
-    auto C = bad_char(pat, patlen, ab, strlen(ab));
+    auto C = bad_char(pat, patlen, ab, ablen);
     int *S = good_suffix(pat, patlen);
-    char txt[STRING_SIZE];
+    char txt[STRING_SIZE+1];
     vector<int> occ;
     if (count_mode)
     {
+        int pos;
         int occnum = 0;
-        int pos = 0;
-        while (pos >= 0)
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = boyer_moore(txt, text_file.gcount(), pat, patlen, C, S);
             occnum += occ.size();
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
         printf("%d\n", occnum);
     }
     else
     {
-        int pos = 0;
-        while (pos >= 0)
+        int pos;
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = boyer_moore(txt, text_file.gcount(), pat, patlen, C, S);
             print_occs(occ, txt, text_file.gcount());
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
     }
@@ -99,43 +100,40 @@ void use_boyer_moore(ifstream &text_file, char *pat, int patlen, bool count_mode
 
 void use_shift_or_64(ifstream &text_file, char *pat, int patlen, bool count_mode)
 {
-    char txt[STRING_SIZE];
+    char txt[STRING_SIZE+1];
     vector<int> occ;
-    auto C = char_mask(pat, patlen, ab, strlen(ab));
+    auto C = char_mask(pat, patlen, ab, ablen);
     auto ones = all_ones(patlen);
-
     if (count_mode)
     {
+        int pos;
         int occnum = 0;
-        int pos = 0;
-        while (pos >= 0)
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = shift_or_64(txt, text_file.gcount(), pat, patlen, C, ones);
             occnum += occ.size();
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
         printf("%d\n", occnum);
     }
     else
     {
-        int pos = 0;
-        while (pos >= 0)
+        int pos;
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = shift_or_64(txt, text_file.gcount(), pat, patlen, C, ones);
             print_occs(occ, txt, text_file.gcount());
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
     }
 
     free(ones->bits);
     free(ones);
-    for (int i = 0; i < strlen(ab); ++i)
+    for (int i = 0; i < ablen; ++i)
     {
         free(C[ab[i]]->bits);
         free(C[ab[i]]);
@@ -144,43 +142,41 @@ void use_shift_or_64(ifstream &text_file, char *pat, int patlen, bool count_mode
 
 void use_shift_or(ifstream &text_file, char *pat, int patlen, bool count_mode)
 {
-    char txt[STRING_SIZE];
+    char txt[STRING_SIZE+1];
     vector<int> occ;
-    auto C = char_mask(pat, patlen, ab, strlen(ab));
+    auto C = char_mask(pat, patlen, ab, ablen);
     auto ones = all_ones(patlen);
 
     if (count_mode)
     {
+        int pos;
         int occnum = 0;
-        int pos = 0;
-        while (pos >= 0)
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = shift_or(txt, text_file.gcount(), pat, patlen, C, ones);
             occnum += occ.size();
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
         printf("%d\n", occnum);
     }
     else
     {
-        int pos = 0;
-        while (pos >= 0)
+        int pos;
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
             occ = shift_or(txt, text_file.gcount(), pat, patlen, C, ones);
             print_occs(occ, txt, text_file.gcount());
             pos = text_file.tellg();
-            text_file.clear();
             text_file.seekg(pos - patlen + 1);
         }
     }
 
     free(ones->bits);
     free(ones);
-    for (int i = 0; i < strlen(ab); ++i)
+    for (int i = 0; i < ablen; ++i)
     {
         free(C[ab[i]]->bits);
         free(C[ab[i]]);
@@ -189,107 +185,67 @@ void use_shift_or(ifstream &text_file, char *pat, int patlen, bool count_mode)
 
 void use_sellers(ifstream &text_file, char *pat, int patlen, int edit_distance, bool count_mode)
 {
-    char txt[STRING_SIZE];
+    char txt[STRING_SIZE+1];
     vector<int> occ;
+
     if (count_mode)
     {
+        int pos;
         int occnum = 0;
-        int pos = 0;
-        while (pos >= 0)
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
-            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
             occnum += occ.size();
             pos = text_file.tellg();
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1);
-
-            text_file.read(txt, patlen - 1);
-            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
-            int correction = occ.size();
-            occnum -= correction;
-
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1 + correction);
+            text_file.seekg(pos - patlen + 1 + edit_distance);
         }
         printf("%d\n", occnum);
     }
     else
     {
-        int pos = 0;
-        while (pos >= 0)
+        int pos;
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
-            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
+            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
             print_occs(occ, txt, text_file.gcount());
             pos = text_file.tellg();
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1);
-
-            text_file.read(txt, patlen - 1);
-            occ = sellers(txt, text_file.gcount() - 1, pat, patlen, edit_distance);
-            int correction;
-            if(!occ.empty())
-                correction = patlen - 1;
-            else
-                correction = 0;
-
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1 + correction);
+            text_file.seekg(pos - patlen + 1 + edit_distance);
         }
     }
 }
 
 void use_ukkonen(ifstream &text_file, char *pat, int patlen, int edit_distance, bool count_mode)
 {
-    char txt[STRING_SIZE];
+    char txt[STRING_SIZE+1];
     vector<int> occ;
-    Ukk_fsm *fsm = build_ukk_fsm(pat, patlen, ab, strlen(ab), edit_distance);
+    Ukk_fsm *fsm = build_ukk_fsm(pat, patlen, ab, ablen, edit_distance);
+
     if (count_mode)
     {
+        int pos;
         int occnum = 0;
-        int pos = 0;
-        while (pos >= 0)
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            occ = sellers(txt, text_file.gcount(), pat, patlen, edit_distance);
             occnum += occ.size();
             pos = text_file.tellg();
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1);
-
-            text_file.read(txt, patlen - 1);
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
-            int correction = occ.size();
-            occnum -= correction;
-
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1 + correction);
+            text_file.seekg(pos - patlen + 1 + edit_distance);
         }
         printf("%d\n", occnum);
     }
     else
     {
-        int pos = 0;
-        while (pos >= 0)
+        int pos;
+        while (pos > -1)
         {
             text_file.read(txt, STRING_SIZE);
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
+            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, ablen, edit_distance, fsm);
             print_occs(occ, txt, text_file.gcount());
             pos = text_file.tellg();
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1);
-
-            text_file.read(txt, patlen - 1);
-            occ = ukk(txt, text_file.gcount(), pat, patlen, ab, strlen(ab), edit_distance, fsm);
-            int correction;
-            if(!occ.empty())
-                correction = patlen - 1;
-            else
-                correction = 0;
-
-            text_file.clear();
-            text_file.seekg(pos - patlen + 1 + correction);
+            text_file.seekg(pos - patlen + 1 + edit_distance);
         }
     }
 }
