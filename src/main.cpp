@@ -144,7 +144,6 @@ int main(int argc, char **argv)
                 cout << "____ could not open pattern file " << pattern_path << " ____\n";
                 return 1;
             }
-            pattern_file.getline(pat, STRING_SIZE_LESS);
             while (!pattern_file.eof())
             {
                 pattern_file.getline(pat, STRING_SIZE_LESS);
